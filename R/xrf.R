@@ -390,7 +390,6 @@ xrf.formula <- function(object, data, family,
 
   xgboost_conditioned <- condition_xgb_control(family, xgb_control, data, response_var)
   xgb_control <- xgboost_conditioned$xgb_control
-  print(xgb_control)
   data <- xgboost_conditioned$data
   xrf_preconditions(family, xgb_control, glm_control, data, response_var, prefit_xgb)
 
@@ -398,6 +397,7 @@ xrf.formula <- function(object, data, family,
   design_matrix <- model_matrix_method(expanded_formula, data)
 
   if (is.null(prefit_xgb)) {
+    # Remove warning about unused param nrounds
     m_xgb <- xgboost(data = design_matrix,
                      label = data[[response_var]],
                      nrounds = xgb_control$nrounds, 
