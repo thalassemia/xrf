@@ -86,7 +86,8 @@ xrf_preconditions <- function(family, xgb_control, glm_control,
 ## this may be exposed to the user in the future
 get_xgboost_objective <- function(family) {
   if (family == 'gaussian') {
-    return('reg:linear')
+    # reg:linear deprecated in favor of reg:squarederror
+    return('reg:squarederror')
   }
   else if (family == 'binomial') {
     return('binary:logistic')
@@ -400,7 +401,7 @@ xrf.formula <- function(object, data, family,
                      label = data[[response_var]],
                      nrounds = xgb_control$nrounds,
                      objective = get_xgboost_objective(family),
-                     params = xgb_control,
+                     params = xgb_control[-nrounds],
                      verbose = 0)
     rules <- extract_xgb_rules(m_xgb)
   }
