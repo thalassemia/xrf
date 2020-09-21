@@ -400,7 +400,7 @@ xrf.formula <- function(object, data, family,
   if (is.null(prefit_xgb)) {
     m_xgb <- xgboost(data = design_matrix,
                      label = data[[response_var]],
-                     nrounds = xgb_control$nrounds
+                     nrounds = xgb_control$nrounds,
                      objective = get_xgboost_objective(family),
                      params = xgb_control,
                      verbose = 0)
