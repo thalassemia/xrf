@@ -16,7 +16,7 @@ condition_xgb_control <- function(family, xgb_control, data, response_var) {
     xgb_control$num_class <- n_distinct(data[[response_var]])
   }
 
-  # xgboost expects multinomial labels to be 0:num_class
+  # expects multinomial labels to be 0:num_class
   if (family == 'multinomial' &&
       (is.factor(data[[response_var]]) || is.character(data[[response_var]]))) {
     integer_response <- as.integer(as.factor(data[[response_var]]))
@@ -399,9 +399,8 @@ xrf.formula <- function(object, data, family,
   if (is.null(prefit_xgb)) {
     m_xgb <- xgboost(data = design_matrix,
                      label = data[[response_var]],
-                     nrounds = xgb_control$nrounds,
                      objective = get_xgboost_objective(family),
-                     params = xgb_control[-nrounds],
+                     params = xgb_control,
                      verbose = 0)
     rules <- extract_xgb_rules(m_xgb)
   }
