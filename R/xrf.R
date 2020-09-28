@@ -479,6 +479,7 @@ xrf.formula <- function(object, data, family, sgd_control = NULL,
 #' @param ... ignored arguments
 #'
 #' @importFrom Matrix sparse.model.matrix
+#' @import sgd
 #'
 #' @examples
 #' m <- xrf(Petal.Length ~ ., iris,
@@ -512,6 +513,7 @@ model.matrix.xrf <- function(object, data, sparse = TRUE, ...) {
 #' @param sparse a logical indicating whether a sparse design matrix should be used
 #' @param type the type of predicted value produced
 #' @param ... ignored arguments
+#' @import sgd
 #'
 #' @examples
 #' m <- xrf(Petal.Length ~ ., iris,
@@ -548,6 +550,7 @@ synthesize_conjunctions <- function(rules) {
 #'
 #' @param object an object of class "xrf"
 #' @param ... ignored arguments
+#' @import sgd
 #'
 #' @examples
 #' m <- xrf(Petal.Length ~ ., iris,
