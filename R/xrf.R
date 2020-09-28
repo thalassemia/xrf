@@ -456,7 +456,7 @@ xrf.formula <- function(object, data, family, sgd_control = NULL,
   # glmnet automatically adds an intercept
   #full_formula <- update(full_formula, . ~ . -1)
 
-  m_glm <- sgd(full_formula, data=full_data,
+  m_glm <- sgd::sgd(full_formula, data=full_data,
                     model = "glm",
                     family = family,
                     lambda1 = 1, # this specifies the LASSO
