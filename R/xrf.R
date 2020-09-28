@@ -366,6 +366,7 @@ xrf <- function(object, ...) {
 #' @importFrom stats predict
 #' @importFrom stats terms
 #' @importFrom stats update
+#' @import sgd
 #'
 #' @references
 #' Friedman, J. H., & Popescu, B. E. (2008). Predictive learning via rule
@@ -455,7 +456,7 @@ xrf.formula <- function(object, data, family, sgd_control = NULL,
   # glmnet automatically adds an intercept
   #full_formula <- update(full_formula, . ~ . -1)
 
-  m_glm <- sgd::sgd(full_formula, data=full_data,
+  m_glm <- sgd(full_formula, data=full_data,
                     model = "glm",
                     model.control = list(family = family, lambda1 = 1), # this specifies the LASSO
                     shuffle = T,
@@ -510,6 +511,7 @@ model.matrix.xrf <- function(object, data, sparse = TRUE, ...) {
 #' @param sparse a logical indicating whether a sparse design matrix should be used
 #' @param type the type of predicted value produced
 #' @param ... ignored arguments
+#' @import sgd
 #'
 #' @examples
 #' m <- xrf(Petal.Length ~ ., iris,
