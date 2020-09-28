@@ -525,7 +525,6 @@ predict.xrf <- function(object, newdata,
   stopifnot(is.data.frame(newdata))
   full_data <- model.matrix(object, newdata, sparse)
   full_data <- as.matrix(full_data)
-  newdata <- design_matrix_method(no_response_formula, newdata)
 
   sgd::predict(object$glm, newdata = full_data, type = type)
 }
@@ -560,8 +559,7 @@ coef.xrf <- function(object, ...) {
   rule_conjunctions <- synthesize_conjunctions(object$rules)
   glm_coefficients <- sgd::coef(object$glm)
   glm_df <- as.data.frame(as.matrix(glm_coefficients))
-  glm_df$term <- rownames(glm_df)
-  rownames(glm_df) <- NULL
+  glm_df$term <- attr(delete.response(terms(object$rule_augmented_formula)), "term.labels")
   glm_df %>%
     left_join(rule_conjunctions, by = c('term' = 'rule_id')) %>%
     arrange_at(colnames(glm_df[1])) %>%
