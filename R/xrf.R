@@ -457,7 +457,7 @@ xrf.formula <- function(object, data, family, sgd_control = NULL,
   #full_formula <- update(full_formula, . ~ . -1)
 
   m_glm <- sgd(full_formula, data=full_data,
-                    model = "glm"
+                    model = "glm",
                     family = family,
                     lambda1 = 1, # this specifies the LASSO
                     shuffle = T,
@@ -468,7 +468,7 @@ xrf.formula <- function(object, data, family, sgd_control = NULL,
                  base_formula = expanded_formula,
                  rule_augmented_formula = full_formula,
                  rules = rules),
-            class = 'xrf')
+                 class = 'xrf')
 }
 
 #' Generate the design matrix from an eXtreme RuleFit model
