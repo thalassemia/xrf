@@ -23,7 +23,8 @@ Imports:
     dplyr,
     fuzzyjoin,
     rlang,
-    methods
+    methods,
+    sgd
 Suggests: 
     testthat,
     covr
