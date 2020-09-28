@@ -457,8 +457,7 @@ xrf.formula <- function(object, data, family, sgd_control = NULL,
 
   m_glm <- sgd::sgd(full_formula, data=full_data,
                     model = "glm",
-                    family = family,
-                    lambda1 = 1, # this specifies the LASSO
+                    model.control = list(family = family, lambda1 = 1), # this specifies the LASSO
                     shuffle = T,
                     sgd.control = sgd_control)
 
@@ -524,7 +523,10 @@ predict.xrf <- function(object, newdata,
                         type = 'response',
                         ...) {
   stopifnot(is.data.frame(newdata))
-  full_data <- as.matrix(model.matrix(object, newdata, sparse))
+  full_data <- model.matrix(object, newdata, sparse)
+  design_matrix_method <- if (sparse) sparse.model.matrix else model.matrix
+  no_response_formula <- delete.response(terms(object$rule_augmented_formula))
+  newdata <- design_matrix_method(no_response_formula, newdata)
 
   sgd::predict(object$glm, newdata = full_data, type = type)
 }
@@ -534,7 +536,7 @@ synthesize_conjunctions <- function(rules) {
     group_by(.data$rule_id)%>%
     arrange(.data$feature, .data$split) %>%
     summarize(
-      conjunction =   paste0(
+      conjunction = paste0(
         .data$feature,
         ifelse(.data$less_than, '<', '>='),
         format(.data$split, scientific = FALSE, digits = 4),
