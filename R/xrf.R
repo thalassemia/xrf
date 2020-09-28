@@ -522,7 +522,7 @@ predict.xrf <- function(object, newdata,
                         sparse = TRUE,
                         type = 'response',
                         ...) {
-  sgd::predict(object$glm, newdata = as.matrix(model.matrix(object, newdata, sparse)), type = type)
+  predict(object$glm, newdata = as.matrix(model.matrix(object, newdata, sparse)), type = type)
 }
 
 synthesize_conjunctions <- function(rules) {
