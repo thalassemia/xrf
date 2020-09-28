@@ -366,7 +366,6 @@ xrf <- function(object, ...) {
 #' @importFrom stats predict
 #' @importFrom stats terms
 #' @importFrom stats update
-#' @import sgd
 #'
 #' @references
 #' Friedman, J. H., & Popescu, B. E. (2008). Predictive learning via rule
@@ -479,7 +478,6 @@ xrf.formula <- function(object, data, family, sgd_control = NULL,
 #' @param ... ignored arguments
 #'
 #' @importFrom Matrix sparse.model.matrix
-#' @import sgd
 #'
 #' @examples
 #' m <- xrf(Petal.Length ~ ., iris,
@@ -513,7 +511,6 @@ model.matrix.xrf <- function(object, data, sparse = TRUE, ...) {
 #' @param sparse a logical indicating whether a sparse design matrix should be used
 #' @param type the type of predicted value produced
 #' @param ... ignored arguments
-#' @import sgd
 #'
 #' @examples
 #' m <- xrf(Petal.Length ~ ., iris,
@@ -529,7 +526,7 @@ predict.xrf <- function(object, newdata,
   stopifnot(is.data.frame(newdata))
   full_data <- model.matrix(object, newdata, sparse)
 
-  predict(object$glm, newdata = full_data, type = type)
+  sgd::predict(object$glm, newdata = full_data, type = type)
 }
 
 synthesize_conjunctions <- function(rules) {
@@ -550,7 +547,6 @@ synthesize_conjunctions <- function(rules) {
 #'
 #' @param object an object of class "xrf"
 #' @param ... ignored arguments
-#' @import sgd
 #'
 #' @examples
 #' m <- xrf(Petal.Length ~ ., iris,
@@ -561,7 +557,7 @@ synthesize_conjunctions <- function(rules) {
 #' @export
 coef.xrf <- function(object, ...) {
   rule_conjunctions <- synthesize_conjunctions(object$rules)
-  glm_coefficients <- coef(object$glm)
+  glm_coefficients <- sgd::coef(object$glm)
   glm_df <- as.data.frame(as.matrix(glm_coefficients))
   glm_df$term <- rownames(glm_df)
   rownames(glm_df) <- NULL
