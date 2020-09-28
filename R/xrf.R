@@ -366,6 +366,7 @@ xrf <- function(object, ...) {
 #' @importFrom stats predict
 #' @importFrom stats terms
 #' @importFrom stats update
+#' @import sgd
 #'
 #' @references
 #' Friedman, J. H., & Popescu, B. E. (2008). Predictive learning via rule
@@ -377,7 +378,7 @@ xrf <- function(object, ...) {
 #'          family = 'gaussian')
 #'
 #' @export
-xrf.formula <- function(object, data, family,
+xrf.formula <- function(object, data, family, sgd_control = NULL,
                         xgb_control = list(nrounds = 100, max_depth = 3),
                         glm_control = list(type.measure = 'deviance',
                                            nfolds = 5),
@@ -453,13 +454,14 @@ xrf.formula <- function(object, data, family,
   full_formula <- add_predictors(expanded_formula, colnames(rule_features))
 
   # glmnet automatically adds an intercept
-  full_formula <- update(full_formula, . ~ . -1)
+  #full_formula <- update(full_formula, . ~ . -1)
 
-  m_glm <- glmnot(full_formula, full_data,
+  m_glm <- sgd(full_formula, data=full_data,
+                    model = "glm"
                     family = family,
-                    alpha = 1, # this specifies the LASSO
-                    sparse = sparse,
-                    glm_control = glm_control)
+                    lambda1 = 1, # this specifies the LASSO
+                    shuffle = T,
+                    sgd.control = sgd_control)
 
   structure(list(glm = m_glm,
                  xgb = m_xgb,
@@ -508,7 +510,6 @@ model.matrix.xrf <- function(object, data, sparse = TRUE, ...) {
 #' @param object an object of class "xrf"
 #' @param newdata data to predict on
 #' @param sparse a logical indicating whether a sparse design matrix should be used
-#' @param lambda the lasso penalty parameter to be applied
 #' @param type the type of predicted value produced
 #' @param ... ignored arguments
 #'
@@ -521,14 +522,12 @@ model.matrix.xrf <- function(object, data, sparse = TRUE, ...) {
 #' @export
 predict.xrf <- function(object, newdata,
                         sparse = TRUE,
-                        lambda = 'lambda.min',
                         type = 'response',
                         ...) {
   stopifnot(is.data.frame(newdata))
   full_data <- model.matrix(object, newdata, sparse)
 
-  predict(object$glm, newdata = full_data,
-          sparse = sparse, lambda = lambda, type = type)
+  predict(object$glm, newdata = full_data, type = type)
 }
 
 synthesize_conjunctions <- function(rules) {
@@ -548,21 +547,19 @@ synthesize_conjunctions <- function(rules) {
 #' Produce rules & coefficients for the RuleFit model
 #'
 #' @param object an object of class "xrf"
-#' @param lambda the lasso penalty parameter to be applied as in 'glmnet'
 #' @param ... ignored arguments
 #'
 #' @examples
 #' m <- xrf(Petal.Length ~ ., iris,
 #'          xgb_control = list(nrounds = 20, max_depth = 2),
 #'          family = 'gaussian')
-#' linear_model_coefficients <- coef(m, lambda = 'lambda.1se')
+#' linear_model_coefficients <- coef(m)
 #'
 #' @export
-coef.xrf <- function(object, lambda = 'lambda.min', ...) {
+coef.xrf <- function(object, ...) {
   rule_conjunctions <- synthesize_conjunctions(object$rules)
-  glm_coefficients <- coef(object$glm, s = lambda)
+  glm_coefficients <- coef(object$glm)
   glm_df <- as.data.frame(as.matrix(glm_coefficients))
-  colnames(glm_df) <- sapply(lambda, function(lambda_value) { paste0('coefficient_', lambda) })
   glm_df$term <- rownames(glm_df)
   rownames(glm_df) <- NULL
   glm_df %>%
@@ -593,10 +590,6 @@ summary.xrf <- function(object, ...) {
   cat(paste0('An eXtreme RuleFit model of ', n_distinct(object$rules$rule_id), ' rules.'))
   cat(paste0('\n\nOriginal Formula:\n\n'))
   cat(smaller_formula(object$base_formula))
-  cat('\n\nTree model:\n\n')
-  show(summary(object$xgb))
-  cat('\n\nGLM:\n\n')
-  show(summary(object$glm))
 }
 
 #' Print an eXtreme RuleFit model
