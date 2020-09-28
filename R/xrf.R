@@ -524,7 +524,7 @@ predict.xrf <- function(object, newdata,
                         type = 'response',
                         ...) {
   stopifnot(is.data.frame(newdata))
-  full_data <- model.matrix(object, newdata, sparse)
+  full_data <- as.matrix(model.matrix(object, newdata, sparse))
 
   sgd::predict(object$glm, newdata = full_data, type = type)
 }
